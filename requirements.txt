@@ -1,0 +1,7 @@
+pandas
+numpy
+sentence-transformers
+pinecone-client
+python-dotenv
+openai
+tqdm
