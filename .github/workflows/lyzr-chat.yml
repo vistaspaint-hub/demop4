@@ -1,0 +1,39 @@
+name: Lyzr Chat Pipeline
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+jobs:
+  run_lyzr_chat:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Install curl
+        run: sudo apt-get update && sudo apt-get install -y curl
+
+      - name: Trigger Lyzr Chat Agent
+        env:
+          LYZR_CHAT_ENDPOINT: ${{ secrets.LYZR_CHAT_ENDPOINT }}
+          LYZR_API_KEY: ${{ secrets.LYZR_API_KEY }}
+          LYZR_USER_ID: ${{ secrets.LYZR_USER_ID }}
+          LYZR_AGENT_ID: ${{ secrets.LYZR_AGENT_ID }}
+        run: |
+          echo "Triggering Lyzr Chat Agent..."
+
+          curl -X POST "$LYZR_CHAT_ENDPOINT" \
+            -H "Content-Type: application/json" \
+            -H "x-api-key: $LYZR_API_KEY" \
+            --data @- <<EOF
+          {
+            "user_id": "$LYZR_USER_ID",
+            "agent_id": "$LYZR_AGENT_ID",
+            "session_id": "$LYZR_AGENT_ID-${{ github.run_id }}",
+            "message": "Hello from GitHub Actions"
+          }
+          EOF
